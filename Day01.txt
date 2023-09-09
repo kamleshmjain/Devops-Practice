@@ -1,0 +1,43 @@
+GIT --- PUSH ---( BUID )
+  code move server                           ---- code clone ---
+  create the jar and war file using maven    ---- MVN ---------- 
+     Java      - maven/gradle  -- jar/war file
+	 .Net      - Msbuild       -- exe
+	 Container - Docker        -- docker images
+	 
+	 
+	 java -jar spring.jar
+	 
+	 jenkins job  ---  (code clone -> MVN build -> Deploy) 
+  move that jar file to webapps folder       ---- use shell for moving the jar file ---
+
+Jenkins(manager) -- agents1
+                      -- job1
+					  
+					  
+pipeline {
+    agent any
+    
+    tools{
+        jdk 'jdk11'
+        maven 'maven'
+    }
+
+    stages {
+        stage('Git Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/jaiswaladi246/Petclinic.git'
+            }
+        }
+        stage('Maven Build') {
+            steps {
+                sh "mvn clean package"
+            }
+        }
+        stage('deploy') {
+            steps {
+                sh "sudo cp target/*.war /opt/apache-tomcat-9.0.65/webapps/"
+            }
+        }           
+    }
+}

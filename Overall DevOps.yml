@@ -1,0 +1,2369 @@
+############################################################################# Docker #########################################################################################
+########### RUN CONTAINER #################
+#                                         #
+
+###########################################
+#download the private registery
+sudo docker run –d –p 5000:5000 –-name registry registry:2
+
+#Pull the ubuntu:16.04 image from Docker Hub.
+docker pull ubuntu:16.04
+
+#Tag the image as localhost:5000/my-ubuntu. This creates an additional tag for the existing image. When the first part of the tag is a hostname and port, Docker interprets this as the location of a registry, when pushing.
+docker tag ubuntu:16.04 localhost:5000/my-ubuntu
+
+#Push the image to the local registry running at localhost:5000:
+docker push localhost:5000/my-ubuntu
+
+#Remove the locally-cached ubuntu:16.04 and localhost:5000/my-ubuntu images, so that you can test pulling the image from your registry. This does not remove the localhost:5000/my-ubuntu image from your registry.
+docker image remove ubuntu:16.04
+docker image remove localhost:5000/my-ubuntu
+
+#Pull the localhost:5000/my-ubuntu image from your local registry.
+docker pull localhost:5000/my-ubuntu
+
+# To Run the Docker Container
+# docker run IMAGE
+docker run nginx
+
+#assing it a name
+# docker run --name CONTAINER-NAME IMAGE
+docker run -d --name web nginx
+
+#To Map a port
+# docker run -p HOSTPORT:CONTAINER-PORT IMAGE
+docker run -d -p 8080:80 nginx   ## 8080=Host Port, 80=Container Port
+
+#specify working directory
+docker run --rm -it -v $PWD/java-app:/app -w /app maven:3-alpine sh   #-w will go to the working directory when we go into container
+
+# Map all ports
+#docker run -P IMAGE
+docker run -d -P nginx
+
+#Start containers in background
+#docker run -d IMAGE
+docker run -d nginx
+
+#To Assign it a HostName
+#docker run --hostname HOSTNAME IMAGE
+docker run --hostname docker-host nginx
+
+#To add a DNS entry
+#docker run --add-host HOSTNAME:IP IMAGE
+
+#To MAP a local directory to the container
+#docker run -v HOSTDIR:TARGETDIR IMAGE0
+docker run -v ~/:/usr/share/nginx/html nginx
+
+#Change the Entrypoint
+#docker run -it --entrypoint EXECUTABLE image
+docker run -it --entrypoint bash nginx
+
+########### MANAGE CONTAINER #################
+#                                         #
+###########################################
+#Show the list of running containers
+docker ps
+
+#Show the list of all containers
+docker ps -a
+
+#Delete the containers
+#docker rm CONTAINER
+docker rm web
+
+#Delete running Container
+#docker rm -f CONTAINER
+docker rm -f web
+
+#Delete stoped container
+docker container prune
+
+#Stop the running container
+#docker stop CONTAINER
+docker stop web
+
+#Start the stopped container
+#docker start CONTAINER
+docker start web
+
+#Copy files from container to the host
+#docker cp CONTAINER:SOURCE TARGETDIR
+docker cp web:/index.html index.html
+
+#copy file from host to container
+#docker cp TARGET CONTAINER:SOURCE
+docker cp index.html web:/index.html
+
+#Start a shell inside running container
+#docker exec -it CONTAINER EXECUTABLE
+docker exec -it web bash
+
+#Rename	a container
+#docker rename OLD_NAME NEW_NAME
+docker rename 096 web
+
+#Create image out of container
+#docker commit Container
+docker commit web
+
+########### MANAGE IMAGES #################
+#                                         #
+###########################################
+#docker login
+docker login kjain1
+
+#tag image with your docker hub user account
+docker tag nginx:latest kjain1/nginx:v1
+
+#push docker image to your repo
+docker push kjain1/nginx:v1
+
+#Download an IMAGE
+#docker pull IMAGE(:TAG)
+docker pull nginx
+
+#Upload an image to Repo
+#docker push IMAGE
+docker push myimage:1.0
+
+#Delete an image
+delete rmi IMAGE
+ asa  
+#Show a list of all images
+docker images
+
+#Delete Dangling IMAGES
+docker image prune
+
+#Delete all unused images
+docker image prune -a
+
+#Build an image from Dockerfile
+#docker build DIRECTORY
+docker build .
+
+#TAG an IMAGE
+#docker tag IMAGE NEWIMAGE
+docker tag ubuntu ubuntu:18.04
+
+#Build and tag an image from Dockerfile
+#docker build -t IMAGE DIRECTORY
+docker build -t myimage
+
+#Save an Image to Tar file
+#docker save IMAGE > FILE
+docker save nginx > nginx.tar
+
+#LOAD an image from tar file
+#docker load -i TARFILE
+docker load -i nginx.tar
+
+########### INFO & STAT ###################
+#                                         #
+###########################################
+#Show the logs of a container
+#docker logs CONTAINER
+docker logs web
+
+#Show stats of running containers
+docker stats
+
+#Show Processes of container
+#docker top CONTAINER	
+docker top web
+
+#Show installed docker version
+docker version
+
+#Get a Detailed info about an object
+docker inspect nginx
+
+#Show all modified files in container
+#docker diff CONTAINER
+docker diff web
+
+#Show mapped ports of a container
+#docker port Container
+docker port web
+
+###### CONTAINER MANAGMENT COMMAND ########
+#                                         #
+###########################################
+docker create image [command]   # Create the CONTAINER
+docker run image [command]      # Create + Run
+docker start container          # Start the CONTAINER
+docker stop container           # Stop the CONTAINER
+docker kill container           # kill(SIGKILL) the container
+docker restart container        # Restart (STOP + START) CONTAINER
+
+docker pause container          # Suspend the container
+docker unpause container        # Resume the container
+docker rm [-f] container        # Destroy the container (= docker kill + docker rm)
+
+###### Inspect the Containers #############
+#                                         #
+###########################################
+docker ps						 # list running container
+docker ps -a 					 # list all container
+docker logs [-f] container		 # Show the container output (STDOUT + STDERR)
+docker top container [ps option] # list the process running inside the containers
+docker diff container			 # show the diffrence with the image (modified files)
+docker inspect container 		 # show low-level infos (in json formate)
+
+#### INTERACTING WITH THE CONTAINER #######
+#                                         #
+###########################################
+docker attach container 			# attach to a running container 
+docker cp container:path hostpath 	# Copy files from the container
+docker cp hostpath container:path   # copy files into the container
+docker export container 			# export the content of the container (tar archive)
+docker exec container args  		# run the command in an existing container 
+docker wait container 				# wait until the container terminate and return the exit code
+docker commit container image 		# commit a new docker image 
+
+
+#### IMAGE MANAGMENT ######################
+#                                         #
+###########################################
+docker image 						# list all local images
+docker history image				# show the image history list of ancentors
+docker inspect image 				# show low level infos 
+docker tag image tag 				# tag an image
+
+#### IMAGE TRASFER COMMAND ################
+#                                         #
+###########################################
+docker pull repo[:tag]				# pull an image/repo from a registery
+docker push repo[:tag]				# Push an image/repo to a registery
+docker search text 					# Search an image on the official registery
+
+docker login						# login to a registery
+docker logout 						# logout from a registry
+
+#### DOCKER Advantages   ##################
+#                                         #
+###########################################
+highly scalable
+light weight
+highly secure
+cost efficient
+portable & stable
+easy to manage and deploy
+
+#### DOCKER FILE COMMAND ##################
+#                                         #
+###########################################
+FROM IMAGE|scratch 					# Base image for the build
+MAINTAINER email					# Name of the maintainer (metadata)
+LABEL version="1.0"					# Metadata 
+COPY path dst						# Copy path from the context into the container at location dst
+ADD src dst							# same as COPY but untar archives and accept http urls
+RUN args							# run an arbitarary command inside the container
+USER name 							# set the default username
+WORKDIR path						# set the default working directory
+CMD args							# set the default command
+ENV name value						# set an environment variable
+VOLUME ["/data"]					# specify the volume 
+ENTRYPOINT ["executable", "param1", "param2"] # This will use shell processing to subtitude shell variable and will ignore any CMD or docke run command line args
+eg:
+ENTRYPOINT exec top -b 
+
+#Dockerfile:
+FROM ubuntu
+RUN apt-get update
+RUN apt-get install -y python python-pip
+RUN pip install flask
+COPY app.py /opt/app.py
+ENTRYPOINT FLASK_APP=/opt/app.py flask run --host=0.0.0.0
+
+docker build . -t mumshad/mysimple-app
+
+
+#### DOCKER COMPOSE #######################
+#                                         #
+###########################################
+
+version: '3'
+services:
+  web:
+    container_name: web
+    image: nginx
+	ports:
+	 - "8080:80"
+	environment:
+	  kj_env: dev
+
+# docker-compose.yml
+version: '2'
+
+services:
+  web:
+    build: 
+    # build from Dockerfile
+      context: ./Path
+    dockerfile: Dockerfile
+    ports:
+     - "5000:5000"
+    volumes:
+     - .:/code
+  redis:
+    image: redis
+	
+	
+version: '3'
+services:
+  jenkins:
+    container_name: jenkins
+    image: jenkins-ansible
+    build:
+      context: jenkins-ansible     
+    ports:
+      - "8080:8080"
+    volumes:
+      - $PWD/jenkins_home:/var/jenkins_home
+    networks:
+      - net
+  remote_host:
+    container_name: remote-host
+    image: remote-host
+    build:
+      context: centos7
+    volumes:
+      - $PWD/aws-s3.sh:/tmp/script.sh
+    networks:
+      - net
+  db_host:
+    container_name: db
+    image: mysql:5.7
+    environment:
+        - "MYSQL_ROOT_PASSWORD=1234"
+    volumes:
+      - $PWD/db_data:/var/lib/mysql
+    networks:
+      - net
+  web:
+    container_name: web
+    image: ansible-web
+    build:
+      context: jenkins-ansible/web
+    ports:
+      - "80:80"
+    networks:
+      - net
+  git:
+    container_name: git-server
+    image: 'gitlab/gitlab-ce:latest'
+    hostname: 'gitlab.example.com'
+    ports:
+      - '8090:80'
+    volumes:
+      - '/srv/gitlab/config:/etc/gitlab'
+      - '/srv/gitlab/logs:/var/log/gitlab'
+      - '/srv/gitlab/data:/var/opt/gitlab'
+    networks:
+      - net
+networks:
+  net:
+  
+#commands
+docker-compose start
+docker-compose stop
+docker-compose pause
+docker-compose unpausedocker-compose ps
+docker-compose up
+docker-compose down
+
+#to run the containers in background 
+docker-compose up -d
+
+#Building
+web:
+  #build from docker file
+  build:
+    context: ./dir
+  dockerfile: Dockerfile.dev
+  
+  #build from images
+  image: ubuntu
+  image: ubuntu:14.04
+  image: tutum/influxdb
+  image: example-registry:4000/postgresql
+  image: a4bc65fd
+
+#Ports
+  ports:
+    - "3000"
+    - "8000:80"  # guest:host
+	
+  # expose ports to linked services (not to host)
+  expose: ["3000"]
+
+#Entrypoint and CMD example
+FROM alpine
+ENTRYPOINT ["sleep"]
+CMD ["5"]
+
+  
+#Commands
+  # command to execute
+  command: bundle exec thin -p 3000
+  command: [bundle, exec, thin, -p, 3000]
+
+  # override the entrypoint
+  entrypoint: /app/start.sh
+  entrypoint: [php, -d, vendor/bin/phpunit]
+
+#Environment Variable
+  # environment vars
+  environment:
+    RACK_ENV: development
+  environment:
+    - RACK_ENV=development
+
+  # environment vars from file
+  env_file: .env
+  env_file: [.env, .development.env]
+
+
+#Dependencies
+  # makes the `db` service available as the hostname `database`
+  # (implies depends_on)
+  links:
+    - db:database
+    - redis
+
+  # make sure `db` is alive before starting
+  depends_on:
+    - db	
+    
+#Multistage Docker file
+FROM openjdk:8-jdk-alpine as builder
+RUN mkdir -p /app/source
+COPY . /app/source
+WORKDIR /app/source
+RUN ./mvnw clean package
+
+
+FROM builder
+COPY --from=builder /app/source/target/*.jar /app/app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]  
+
+#What does the Docker Build Command do?
+The docker build command builds Docker images from a Dockerfile and a “context”. A builds context is the set of files located in the specified PATH or URL
+
+#What is CMD in docker file
+The CMD command​ specifies the instruction that is to be executed when a Docker container starts.
+
+#What is the Diffrence between Run and CMD in Dockerfile?
+RUN and CMD are both Dockerfile instructions. RUN lets you execute commands inside of your Docker image. ... CMD lets you define a default command to run when your container starts.
+
+#can we have multiple cmd in dockerfile?
+At all times, there can be only one CMD. You are right, the second Dockerfile will overwrite the CMD command of the first one. 
+
+#how to run a script in dockerfile
+ubuntu@linux:~$ nano Dockerfile.
+FROM ubuntu:16.04.
+COPY my-bash.sh /
+RUN chmod +x /my-bash.sh && /my-bash.sh
+CMD ["Finished!"]
+
+
+## Architecture
+#The following image shows the standard and traditional architecture of virtualization.
+app					app      					app
+GuestOS			  GuestOS						GuestOS		   
+				  Hyprovisor(vmware, hyper v)
+				  Host O/S
+				  server
+				  
+
+New Virtualization
+app					app      					app
+				  Docker Engine
+				  Host O/S
+				  server
+				  
+The clear advantage in this architecture is that you don’t need to have extra hardware for Guest OS. Everything works as Docker containers.
+
+
+## building webserver images
+We have already learnt how to use Docker File to build our own custom images. Now let’s see how we can build a web server image which can be used to build containers.
+In our example, we are going to use the Apache Web Server on Ubuntu to build our image. Let’s follow the steps given below, to build our web server Docker file.
+Step 1 − The first step is to build our Docker File. Let’s use vim and create a Docker File with the following information.
+
+FROM ubuntu 
+RUN apt-get update 
+ENV DEBIAN_FRONTEND noninteractive    ## to avoid the interactive console
+RUN apt-get install –y apache2 
+RUN apt-get install –y apache2-utils 
+RUN apt-get clean 
+EXPOSE 80 
+CMD [“apache2ctl”, “-D”, “FOREGROUND”]
+
+The following points need to be noted about the above statements −
+We are first creating our image to be from the Ubuntu base image.
+Next, we are going to use the RUN command to update all the packages on the Ubuntu system.
+Next, we use the RUN command to install apache2 on our image.
+Next, we use the RUN command to install the necessary utility apache2 packages on our image.
+Next, we use the RUN command to clean any unnecessary files from the system.
+The EXPOSE command is used to expose port 80 of Apache in the container to the Docker host.
+
+Finally, the CMD command is used to run apache2 in the background.
+
+Apache2
+Now that the file details have been entered, just save the file.
+
+Step 2 − Run the Docker build command to build the Docker file. It can be done using the following command −
+
+sudo docker build –t=”mywebserver” . 
+We are tagging our image as mywebserver. Once the image is built, you will get a successful message that the file has been built.
+
+Mywebservers
+Step 3 − Now that the web server file has been built, it’s now time to create a container from the image. We can do this with the Docker run command.
+
+sudo docker run –d –p 80:80 mywebserver 
+
+#Docker is an open source platform for developing, shipping, and running applications. Docker enables you to separate your applications from your infrastructure so you can deliver software quickly. 
+#Kubernetes is an orchestration framework for Docker containers which helps expose containers as services to the outside world. For example, you can have two services 
+
+#Does CMD overwrite ENTRYPOINT ?
+The ENTRYPOINT instruction works very similarly to CMD in that it is used to specify the command executed when the container is started. However, where it differs is that ENTRYPOINT doesnt allow you to override the command. Instead, anything added to the end of the docker run command is appended to the command.
+
+#what is bridge network
+The bridge driver creates a private network internal to the host so containers on this network can communicate. External access is granted by exposing ports to containers. Docker secures the network by managing rules that block connectivity between different Docker networks
+
+Overlay networks are usually used to create a virtual network between two separate hosts. Virtual, since the network is build over an existing network.
+
+
+#What are the types of Docker networks?
+There are three common Docker network types – bridge networks, used within a single host, overlay networks, for multi-host communication, and macvlan networks which are used to connect Docker containers directly to host network interfaces.
+
+#what is port forwarding in docker
+In Docker, the containers themselves can have applications running on ports. When you run a container, if you want to access the application in the container via a port number, you need to map the port number of the container to the port number of the Docker host
+
+#what is docker system prune and docker image prune
+The docker image prune command allows you to clean up unused images. By default, docker image prune only cleans up dangling images. A dangling image is one that is not tagged and is not referenced by any container.
+
+docker system prune: Remove all unused containers, networks, images (both dangling and unreferenced), and optionally, volumes.
+
+
+#how many types of volumes are there in docker
+Host volumes
+A host volume can be accessed from within a Docker container and is stored on the host, as per the name. To create a host volume, run:
+docker run -v /path/on/host:/path/in/container
+
+Anonymous volumes
+The location of anonymous volumes is managed by Docker. Note that it can be difficult to refer to the same volume when it is anonymous. To create an anonymous volume, run:
+docker run -v /path/in/container ...
+
+Named volumes
+Named volumes and anonymous volumes are similar in that Docker manages where they are located. However, as you might guess, named volumes can be referred to by specific names. To create a named volume, run:
+docker volume create somevolumename
+docker run -v name:/path/in/container ...
+
+##################################### Maven ########################################################
+#################                                                                  #################
+###################################### ################ ############################################
+Maven is a powerful build automation and dependency management tool used primarily for Java projects, 
+although it can be used for projects in other programming languages as well. It provides a comprehensive
+set of features to help manage the software development lifecycle and simplify the build process.
+
+Here's how Maven can be used in this scenario:
+
+Project Setup: The development team creates a new Maven project for "MyWebApp" using Maven's project archetype. They define the project structure and configuration files such as pom.xml, which is the heart of the Maven project.
+
+Dependency Management: Maven allows the team to specify project dependencies in the pom.xml file. They can easily add dependencies on external libraries, frameworks, and other projects. Maven automatically resolves and downloads the required dependencies from remote repositories, simplifying the process.
+
+Build Automation: The team defines build configurations and plugins in the pom.xml file. They can specify tasks such as compiling source code, running tests, generating documentation, and packaging the application into an executable format (e.g., JAR or WAR file).
+
+Continuous Integration: To ensure a smooth development workflow, the team sets up a continuous integration (CI) system like Jenkins or Travis CI. The CI system is configured to monitor the version control repository (e.g., Git) for changes. Whenever a new commit is made, the CI system automatically triggers a build process using Maven.
+
+Testing and Quality Assurance: Maven integrates well with testing frameworks like JUnit. The team writes unit tests for their code and configures Maven to execute these tests as part of the build process. Additionally, they can configure Maven plugins to perform static code analysis, code coverage analysis, and other quality checks.
+
+Deployment and Release: Once the development team is satisfied with the application's quality, they can use Maven to create a deployable package (e.g., a WAR file) with all the necessary dependencies included. Maven can also automate the deployment process to application servers or cloud platforms like Tomcat, JBoss, or AWS.
+
+Dependency Updates: As the project evolves, new versions of libraries and dependencies are released. Maven simplifies the task of updating dependencies by providing commands to check for updates and resolve any compatibility issues automatically.
+
+Overall, Maven streamlines the build and deployment process, ensuring consistency and reproducibility across different environments. It saves developers' time by automating repetitive tasks and simplifying dependency management.
+
+Maven Build Lifecycle
+Maven has three built-in build lifecycles: clean, default, and site.
+
+Clean Lifecycle: Deletes any build output generated by previous builds.
+
+clean: Deletes any build output generated by previous builds.
+Default Lifecycle: (vacote pain de) 
+
+validate: Validates the project structure and verifies if all necessary information is available.
+compile: Compiles the project's source code.
+test: Runs unit tests against compiled source code.
+package: Packages the compiled code into a distributable format (e.g., JAR, WAR).
+install: Installs the package into the local repository for use as a dependency in other projects (.m2).
+deploy: Deploys the package to a remote repository for sharing with other developers or environments (Push to Nexus).
+Site Lifecycle:
+
+site: Generates project documentation and reports.  
+site-deploy: Deploys the generated documentation to a remote web server.
+
+Maven Command Examples:
+Here are some common Maven commands:
+
+mvn compile: Compiles the project's source code.
+mvn test: Runs unit tests against compiled code.
+mvn package: Packages the compiled code into a distributable format.
+mvn install: Installs the package into the local repository.
+mvn deploy: Deploys the package to a remote repository.
+mvn site: Generates project documentation and reports.
+mvn site-deploy: Deploys the generated documentation to a remote web server.
+mvn clean: Executes the clean phase, deleting any previous build outputs.
+
+# TO download the demo java project you can go to start.spring.io and select
+# language: Java Maven
+# Spring Boot: 3.1.0
+# Project Metadata: 
+#   Group: com.example
+#   Artifact: demo
+#   Name: demo
+#   Description: demo project
+#   Package Name: com.example.project
+#   Packaging: Jar
+# Dependencies: 
+#   Spring web
+#   Spring reactive web
+
+#This will download the zip file that we can deploy on git and use it for our project
+# create EC2 te.small machine
+# run 
+#    sudo apt-get update -y
+#    sudo apt-get install openjdk-11-jre -y
+#    sudo apt-get install maven -y 
+#    git clone https://github.com/jaiswaladi246/springboot-java-poject.git    
+#    mvn clean package
+#    java -jar <application>.jar
+#    try accessing vm-public-ip:8080
+
+DAY3:
+##################----INSTALL TOMCAT----##################
+cd /opt
+sudo wget https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.65/bin/apache-tomcat-9.0.65.tar.gz
+sudo tar -xvf apache-tomcat-9.0.65.tar.gz
+
+
+cd /opt/apache-tomcat-9.0.65/conf
+sudo vi tomcat-users.xml
+# ---add-below-line at the end (2nd-last line)----
+# <user username="admin" password="admin1234" roles="admin-gui, manager-gui"/>
+
+sudo ln -s /opt/apache-tomcat-9.0.65/bin/startup.sh /usr/bin/startTomcat
+sudo ln -s /opt/apache-tomcat-9.0.65/bin/shutdown.sh /usr/bin/stopTomcat
+
+sudo vi /opt/apache-tomcat-9.0.65/webapps/manager/META-INF/context.xml
+
+comment:
+<!-- Valve className="org.apache.catalina.valves.RemoteAddrValve"
+  allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /> -->
+
+sudo vi /opt/apache-tomcat-9.0.65/webapps/host-manager/META-INF/context.xml
+
+comment:
+<!-- Valve className="org.apache.catalina.valves.RemoteAddrValve"
+  allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /> -->
+
+sudo stopTomcat
+sudo startTomcat
+
+sudo cp target/*.war /opt/apache-tomcat-9.0.65/webapps/
+
+####################### DAY4: JENKINS #################################
+Jenkins is an open-source automation server that allows you to automate various tasks in your software development workflow, such as building, testing, and deploying applications. It provides a web-based interface and supports a wide range of plugins for integrating with different tools and technologies.
+ 
+--- INSTALL JENKINS ON LINUX METHOD -1 ---
+sudo apt update -y
+sudo apt install openjdk-11-jre -y
+
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt-get update -y 
+sudo apt-get install jenkins -y
+
+sudo systemctl enable jenkins
+sudo systemctl start jenkins
+sudo systemctl status jenkins
+
+--- INSTALL JENKINS ON LINUX METHOD -2 ---
+sudo apt update -y
+sudo apt install openjdk-11-jre -y
+sudo wget https://updates.jenkins.io/download/war/2.387.3/jenkins.war
+java -jar jenkins.war  --httpPort=8082
+
+Pass- 52ac1ffd9ad14993be7ecdf00a7eb46f  kjain
+
+#######################  DAY-5 | SONARQUBE #################################
+SonarQube is an open-source platform that provides static code analysis and code quality management. It is designed to help developers and development teams identify and fix code issues early in the software development lifecycle. SonarQube analyzes source code for bugs, vulnerabilities, code smells, and code duplications, and provides detailed reports with actionable insights.
+
+Here are some key features of SonarQube:
+
+Static Code Analysis: SonarQube performs static analysis on source code, analyzing its structure, syntax, and patterns to identify potential issues and violations of coding standards.
+
+Code Quality Metrics: SonarQube calculates various code quality metrics, such as code coverage, cyclomatic complexity, duplications, and maintainability index. These metrics help developers evaluate the overall quality of their codebase.
+
+Issue Tracking: SonarQube identifies and categorizes issues in the code, such as bugs, security vulnerabilities, and code smells. It provides detailed information about each issue, including the affected code snippet, severity level, and recommended fixes.
+
+Continuous Inspection: SonarQube supports continuous integration and continuous delivery (CI/CD) workflows by integrating with popular build tools and version control systems. It can be seamlessly integrated into the development pipeline to automatically analyze code with every build.
+
+Custom Rules and Quality Profiles: SonarQube allows you to define custom coding rules and quality profiles to align with your project's specific requirements and coding standards. This helps enforce consistent code quality across your development team.
+
+Integrations: SonarQube integrates with a wide range of development tools and IDEs, enabling developers to receive real-time feedback on code quality while they write code. It also integrates with popular CI/CD platforms to provide continuous inspection throughout the software development process.
+
+By using SonarQube, development teams can proactively identify and address code issues, improve code maintainability, enhance security, and ensure adherence to coding standards. It helps foster a culture of quality within development teams and promotes the delivery of robust and reliable software.
+
+#install sonarqube on separate server
+sudo apt install openjdk-17-jre -y
+wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.1.0.73491.zip
+sudo apt install unzip
+unzip sonarqube-10.1.0.73491.zip
+cd sonarqube-10.1.0.73491/
+cd bin/
+cd linux-x86-64/
+  
+
+--- Docker Installation ---
+
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+echo \
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt-get update
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo apt install docker-compose
+
+service docker restart
+sudo usermod -aG docker $USER
+newgrp docker
+sudo chmod 666 /var/run/docker.sock
+sudo systemctl restart docker
+
+# TO ISNTALL SONARQUBE USING DOCKER RUN BELOW COMMAND  
+docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
+
+# Jenkins pipeline to run SOnar analysis
+pipeline {
+    agent any
+    
+    tools {
+        jdk 'jdk11'
+        maven 'maven3'
+    }
+    
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                # Checkout your Java project from version control
+                # For example:
+                # git 'https://github.com/your-repo/java-project.git'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                # Build your Java project
+                # For example:
+                # sh 'mvn clean install'
+            }
+        }
+        
+        stage('SonarQube Analysis') {
+            steps {
+                # Run SonarQube analysis
+                # Make sure you have SonarQube configured in Jenkins and provide the correct SonarQube server credentials
+                
+                
+                
+                # Or using the SonarQube Scanner for Maven:
+                # sh 'mvn sonar:sonar'
+            }
+        }
+        
+        stage('Deploy to Tomcat') {
+            steps {
+                # Additional steps to deploy your Java project
+                Invoke-Expression "sudo cp target/*war apache-tomcat-path/webapps"
+            }
+        }
+    }
+}
+###################################### OWASP Dependency Check ######################################
+#################                                                                  #################
+###################################### ################ ############################################
+OWASP Dependency Check is a software composition analysis (SCA) tool that identifies project dependencies with
+known vulnerabilities. It helps developers and security professionals identify and mitigate potential risks associated
+with using vulnerable libraries and components.
+
+Installation
+Setting up OWASP Dependency Check in Jenkins
+To download and set up OWASP Dependency Check in Jenkins, you can follow these steps:
+
+Open Jenkins and navigate to the Jenkins home page.
+
+Click on "Manage Jenkins" in the left-hand sidebar.
+
+Select "Manage Plugins" from the options.
+
+In the "Available" tab, search for "OWASP Dependency-Check Plugin" in the filter box.
+
+Check the checkbox next to the plugin and click on the "Install without restart" button.
+
+Once the installation is complete, go back to the Jenkins home page.
+
+Click on "New Item" in the left-hand sidebar to create a new Jenkins job.
+
+Enter a name for your job and select the type of job you want to create (e.g., Freestyle project or Pipeline).
+
+Configure the job as per your requirements (e.g., source code management, build triggers, etc.).
+
+Scroll down to the "Build" section and click on the "Add build step" dropdown.
+
+Select "Invoke OWASP Dependency-Check" from the dropdown.
+
+Configure the plugin settings according to your needs. This includes specifying the path to your project, any additional arguments, and choosing the appropriate OWASP Dependency-Check installation.
+
+Save the job configuration.
+
+Now, whenever you run the Jenkins job, OWASP Dependency Check will be invoked to analyze your project's dependencies for vulnerabilities.
+
+Note: Before running the job, make sure you have already set up the desired OWASP Dependency-Check installation in Jenkins. You can do this by going to "Manage Jenkins" > "Global Tool Configuration" and adding a new installation for OWASP Dependency Check.
+
+Option 1: Downloading the Standalone JAR - https://github.com/jeremylong/DependencyCheck/releases
+Go to the OWASP Dependency Check releases page.
+Download the latest version of the standalone JAR file (dependency-check.jar).
+Ensure you have Java 8 or higher installed on your system. (ReadMe: https://github.com/jeremylong/DependencyCheck)
+Run the tool using the following command:
+java -jar dependency-check.jar --project <project-name> --scan <path-to-project>
+Option 2: Using Package Managers
+OWASP Dependency Check is available in popular package managers:
+
+Local:
+1) clone the project
+2) run mvn clean package
+3) go to dependency check folder
+4) run command - /bin/dependency-check.sh --out . --scan /home/ubuntu/apps/Petclinic/target/
+
+Jenkins:
+
+
+Maven: Add the following plugin to your pom.xml file:
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.owasp</groupId>
+      <artifactId>dependency-check-maven</artifactId>
+      <version>INSERT_VERSION_HERE</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>check</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+Run mvn dependency-check:check to analyze your project.
+Usage
+Once you have OWASP Dependency Check installed, you can run it against your project to identify vulnerabilities in dependencies.
+
+For the standalone JAR:
+
+java -jar dependency-check.jar --project <project-name> --scan <path-to-project>
+For Maven:
+
+mvn dependency-check:check
+Make sure to replace <project-name> with the name of your project and <path-to-project> with the path to your project's directory.
+ 
+###################################### Jenkins Pipeline ############################################
+#################                                                                  #################
+###################################### ################ ############################################
+jenkins pipeline: Jenkins pipeline is a single platform that runs the entire pipeline as a code.
+
+#features
+pipeline as a code
+code can be checked into VCS
+incorporate user input
+restart from saved checkpoint
+runs jobs in parellel
+integrate with other plugins
+allow conditional loops (for, when)
+
+#how to configure webhook
+1. go to github >> setting >> webhook >> add webhook
+2. in Payload URL copy and past the Jenkins URL and add /github-webhook at the end
+3. Provide the secret for that go to Jenkins >> Username >> Configure >> API Token >> Generate Token & now past this token in secret section'
+4. Finally in your Jenkins job under Build Trigger section enable - GitHub hook trigger for GITScm polling
+
+#What is the path where jenkins download the content
+/var/lib/jenkins/workspace
+
+#how to generate different tag for your images
+docker build -t $JOB_NAME:v1.$BUILD_ID .               #$JOB_NAME will return the Jenkins job name & $BUILD_ID will return build number
+ 
+#how to integrate sonarqube with jenkins https://www.youtube.com/watch?v=meaD9y1RPNc&list=PLLu1bCv5AByHRrefBHKLDltkFK8MHGgwz&index=7
+1. install sonarqube on one server
+2. install sonarqube scanner plugin for jenkins
+3. For setting up authentications Go to SOnar server >> Administration >> Security >> User >> Generate Token
+5. Create the credentials
+4. after installing go to Manage Jenkins >> Configure System >> SonarQube Server 
+     add Name and Sonar Server URL
+6. now in buid steps give
+     mvn clean deploy sonar:sonar
+     
+
+
+#basic pipeline:
+pipeline {
+  agent any
+  stages {
+	stage('build'){
+	  steps{
+	    sh 'echo This is Build step'
+	  }
+	}
+	stage('test'){
+	  steps{
+	     echo "Testing..."
+	  }
+	}
+	stage('Deploy'){
+	  steps{
+	    echo "Deploying..."
+	  }
+	}
+  }
+}
+
+#environment
+pipeline {
+    agent any
+
+    environment {
+        NAME = 'ricardo'
+        LASTNAME = 'gonzalez'
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'echo $NAME $LASTNAME'
+            }
+        }
+    }
+}
+
+#multi steps
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                sh 'echo "My first pipeline"'
+                sh '''
+                    echo "By the way, I can do more stuff in here"
+                    ls -lah
+                '''
+            }
+        }
+    }
+}
+
+#retry
+pipeline {
+    agent any
+    stages {
+        stage('Timeout') {
+            steps {
+                retry(3) {
+                    sh 'I am not going to work :c'
+                }
+            }
+        }
+    }
+}
+
+#timeout
+pipeline {
+    agent any
+    stages {
+        stage('Deploy') {
+            steps {
+                retry(3) {
+                    sh 'echo hello'
+                }
+
+                timeout(time: 3, unit: 'SECONDS') {
+                    sh 'sleep 5'
+                }
+            }
+        }
+    }
+}
+
+#credentials
+pipeline {
+    agent any
+
+    environment {
+        secret = credentials('TEST')
+    }
+    stages {
+        stage('Example stage 1') {
+            steps {
+                sh 'echo $secret'
+            }
+        }
+    }
+}
+
+#Post Action:
+pipeline {
+    agent any
+    stages {
+        stage('Test') {
+            steps {
+                sh 'echo "Fail!"; exit 1'
+            }
+        }
+    }
+    post {
+        always {
+            echo 'I will always get executed :D'
+        }
+        success {
+            echo 'I will only get executed if this success'
+        }
+        failure {
+            echo 'I will only get executed if this fails'
+        }
+        unstable {
+            echo 'I will only get executed if this is unstable'
+        }
+    }
+}
+
+##if you want to test for feature branch build, so below code will only execute if branch name is dev
+     stage("test"){
+	   when{
+	     expression{
+		   env.BRANCH_NAME=='dev'
+		 } 
+	   }
+	 }
+
+#or condition
+when{
+  expression{
+    BRANCH_NAME == 'dev' || BRANCH_NAME == 'master'
+  }
+}	 
+
+#perform the buid if code changes are made
+stage("build"){
+  when{
+    expression{
+	  BRANCH_NAME == 'dev' && CODE_CHANGES == true
+	}
+  }
+}
+
+##Parameters
+#parameters{
+# string(name, defaultvalue, description)
+# choice(name, choice, description)
+# booleanParam(name, defaultValue, description)
+#}
+
+agent any
+parameters{
+  string(name: 'version', defaultValue:'', description: 'version')
+  choice(name: 'version', choice:['1.1', '1.2', '1.3'], description: '')
+  booleanParam(name: 'executeTest', defaultValue:true, description: '')
+}
+
+#run test if exectuteTest is set to true
+stage("test"){
+  when{
+    expression{
+	  param.executeTest{
+	    echo "testing .."
+	  }
+	}
+  }
+}
+stage("deploy"){
+  step{
+    echo 'deploying the application ${params.version}'
+  }
+}
+
+#Q1. What is meant by Continuous Integration?
+I will advise you to begin this answer by giving a small definition of Continuous Integration (CI). It is a development practice that requires developers to integrate code into a shared repository several times a day. Each check-in is then verified by an automated build, allowing teams to detect problems early.
+
+#Q6. Explain how you can setup Jenkins job?
+My approach to this answer will be to first mention how to create Jenkins job. Go to Jenkins top page, select “New Job”, then choose “Build a free-style software project”.
+Then you can tell the elements of this freestyle job:
+
+Optional SCM, such as CVS or Subversion where your source code resides.
+Optional triggers to control when Jenkins will perform builds.
+Some sort of build script that performs the build (ant, maven, shell script, batch file, etc.) where the real work happens.
+Optional steps to collect information out of the build, such as archiving the artifacts and/or recording javadoc and test results.
+Optional steps to notify other people/systems with the build result, such as sending e-mails, IMs, updating issue tracker, etc..
+
+######################################       GIT         ###########################################
+#################                                                                  #################
+###################################### ################ ############################################
+
+Git fetch
+
+Git fetches only downloads new data from a remote repository.
+It does not integrate any of these new data into your working files.
+Can be done any time to update the remote-tracking branches
+Command - git fetch origin
+
+git fetch –-all
+
+
+Git pull
+
+Git pull updates the current HEAD branch with the latest changes from the remote server.
+Downloads new data and integrate it with the current working files.
+Tries to merge remote changes with your local ones.
+Command - git pull origin master
+
+
+#What is the process to revert a commit that has already been pushed and made public?
+There are two processes through which you can revert a commit:
+
+1. Remove or fix the bad file in a new commit and push it to the remote repository. Then commit it to the remote repository using:
+
+git commit –m “commit message”
+
+2. Create a new commit to undo all the changes that were made in the bad commit. Use the following command:
+
+git revert <commit id>
+
+#23. What is the difference between git merge and git rebase?
+To incorporate new commits into your feature branch, you use merge
+Git Merge
+Creates an extra merge commit every time you need to incorporate changes
+Pollutes your feature branch history
+
+GIT Rebase
+Incorporates all the new commits in the master branch
+Rewrites the project history by creating brand new commits for each commit in the original branch
+The major benefit of rebasing is that you get a much cleaner project history.
+
+#Describe branching strategies you have used.
+This question is asked to test your branching experience so tell them about how you have used branching in your previous job and what purpose does it serves, you can refer the below points:
+
+Feature branching
+A feature branch model keeps all of the changes for a particular feature inside of a branch. When the feature is fully tested and validated by automated tests, the branch is then merged into master.
+Task branching
+In this model each task is implemented on its own branch with the task key included in the branch name. It is easy to see which code implements which task, just look for the task key in the branch name.
+Release branching
+Once the develop branch has acquired enough features for a release, you can clone that branch to form a Release branch. Creating this branch starts the next release cycle, so no new features can be added after this point, only bug fixes, documentation generation, and other release-oriented tasks should go in this branch. Once it is ready to ship, the release gets merged into master and tagged with a version number. In addition, it should be merged back into develop branch, which may have progressed since the release was initiated.
+
+
+#Q8. How do you squash last N commits into a single commit?
+There are two options to squash last N commits into a single commit. Include both of the below mentioned options in your answer:
+
+If you want to write the new commit message from scratch use the following command
+git reset –soft HEAD~N &&
+git commit
+
+#Q10. What is Git rebase and how can it be used to resolve conflicts in a feature branch before merge?
+According to me, you should start by saying git rebase is a command which will merge another branch into the branch where you are currently working, and move all of the local commits that are ahead of the rebased branch to the top of the history on that branch.
+Now once you have defined Git rebase time for an example to show how it can be used to resolve conflicts in a feature branch before merge, if a feature branch was created from master, and since then the master branch has received new commits, Git rebase can be used to move the feature branch to the tip of master.
+The command effectively will replay the changes made in the feature branch at the tip of master, allowing conflicts to be resolved in the process. When done with care, this will allow the feature branch to be merged into master with relative ease and sometimes as a simple fast-forward operation.
+
+#Q12. How do you find a list of files that has changed in a particular commit?
+For this answer instead of just telling the command, explain what exactly this command will do so you can say that, To get a list files that has changed in a particular commit use command
+git diff-tree -r {hash}
+
+#Q14. How will you know in Git if a branch has already been merged into master?
+I will suggest you to include both the below mentioned commands:
+git branch –merged lists the branches that have been merged into the current branch.
+git branch –no-merged lists the branches that have not been merged.
+
+#show last 2 logs
+git log -n 2
+
+#https://www.simplilearn.com/tutorials/git-tutorial/merge-conflicts-in-git?source=sl_frs_nav_playlist_video_clicked
+#git pull --rebase orgin master
+#git mergetool
+#git rebase --continue
+#git push origin master
+
+#Git Commands to Resolve Conflicts
+1. git log --merge 
+The git log --merge command helps to produce the list of commits that are causing the conflict
+
+2. git diff 
+The git diff command helps to identify the differences between the states repositories or files
+
+3. git checkout 
+The git checkout command is used to undo the changes made to the file, or for changing branches
+
+4. git reset --mixed 
+The git reset --mixed command is used to undo changes to the working directory and staging area
+
+5. git merge --abort
+The git merge --abort command helps in exiting the merge process and returning back to the state before the merging began
+
+6. git reset
+The git reset command is used at the time of merge conflict to reset the conflicted files to their original state
+
+######################################       K8S         ###########################################
+#################                                                                  #################
+###################################### ################ ############################################
+#Kubernetes Architecture
+kube api server: it is primary management server in k8s, all the k8s components communicate to each other using kube api.
+
+worker node: In k8s worker nodes are the ship that loads the container.
+
+Controller node: It will load, plan how to load, identify the right node, monitor and track the status of node, manage the whole loading process.
+
+Scheduler:  Scheduler identify the right node to place a container based on the resource requirement, worker node capacity or any other policies on containers like taints and tolerations.
+
+Controller Manager: In k8s we have controller that takes care of diffrent areas eg Node Controller, Replication Controller .
+
+kubelet: Kubelet act as a captain on all the cargo ship which receive te instructions from the API Master and basedon that perform the action on pods.
+
+kube proxy: The application running on the ship in the form of containers should communicate to each other ex: web container running on one node should communicate to db container running on another node this is enabled by kube-proxy.
+     Kube-proxys job is to look for new service and everytime new service is created it create an appropriate rule on each node to forward the traffic to these service to the backend pods. it create the ip table rule on each node on the cluster that forward the traffic heading on the service to ip of actual pods.
+	 
+
+#Controller Manager:
+Node Controller: Responsible for managing the status of the node and take the necessary action to keep the application running.
+
+Node Monitory Period = 5 sec
+k8s wait for 40sec to mark node as unreachable
+After making node as unreachable it gives 5min to that node to come back up again if not then it will replace it with healthy node. 
+	 
+Replication controller: Responsible for monitoring the status of replicaset.
+
+#sample pod definition
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx
+
+
+#Pod
+kubectl run nginx-container --image=nginx --dry-run=client -o yml>mypo.yml # This will generate the pod definition file
+kubectl create -f mypo.yml                                                # This will create the pod from pod definition file
+kubectl get po															  # This will show running pods
+kubectl describe po app-pod                  							  # Show extra details about the pods
+
+kubectl run nginx --image=nginx                                           # Create a new pod with nginx image
+kubectl get po -o wide                                                    # This will Show additional details like node name onto which pod is scheduled
+kubectl describe pod newpod|grep -i image								  # Look for image inside running pod
+kubectl delete po webapp												  # Delete the Pod
+kubectl apply -f pod.yml                                                  # This will look for the current state and apply the updated changes to the pod if any
+kubectl edit pod redis													  # This will edit the pod 
+
+#Replication Contoller: ensure the defined number of pods running at all time.
+#Replicaset.
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  labels:
+    app: myapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      type: front-end    ##simply match the label specified under selector to the label of pod
+  template:
+    metadata:
+	  name: myapp-pod
+	  labels:
+	    app: myapp
+		type: front-end
+   spec:
+     containers:
+     - name: nginx-containers
+       image: nginx
+		
+kubectl get rs                        # show the list of replicaset under default NS
+kubectl delete rs my-replica
+kubectl scale --replicas=6 my-replica # this will Scale up the replicas to 6
+
+
+#Deployments
+In production env you might not want to upgrade all your instances at once and want to upgrade one after the other this is known as Rolling Update also you want tthat if anything goes wrong than it should rollback correctly to the older version, 
+all  this capabilities are provided under Deployments.
+
+#sample Deployment definition file
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+  labels:
+    app: myapp
+	type: front-end
+spec:
+  replica: 3
+  selector:
+    matchLabels:
+	  type: front-end
+  template:
+    metadata:
+	  name: myapp-pod
+	  labels:
+	    app: myapp
+		type: front-end
+    spec:
+      containers:
+	    - name: nginx-container
+	      image: nginx
+		
+kubectl get deploy   																					# this will show the running deployments
+kubectl get rs																							# Show the available Replica set
+kubectl create deploy mydeploy --image=nginx --replicas=4 --dry-run=client -o yaml >>  mydeploy.yml		# This will create the deployment definition file with 4 replicas
+kubectl scale deployment mydeploy --replicas=5																	# Scale the existing Deployment to 5 replicas
+
+##Namespaces
+services inside the same namespace can be able to access each other using direct name
+ex: webpod can access db service like mysql.connect("db-service")
+
+but web pod from default namespace to access the db service from dev namespaces
+mysql.connect(db-service.dev.svc.cluster.local)    #db-service: servicename, dev: Namespace, svc: service, cluster.local: Default domain of k8s cluster
+
+
+kubectl create ns dev															# this will create a dev namespace
+kubectl get po -n kube-system 													# Show the pods from kube-system namespace
+kubectl create -f pod.yml -n dev												# This will create the pod under dev namespace
+kubectl config set-context $(kubectl config current-context) --namespace=dev	# This will set the context permanent to dev so no more objects will be created under detault NS
+
+metadata:
+  namespace: dev							# This will always create the pod inside Dev namespace
+  
+  
+##Resource Quota
+To limit the resources under Namespace create resource quota
+apiVerstion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: dev
+spec:
+  hard:
+    pods: "10"
+    requests.cpu: "4"
+    requests.memory: 5Gi
+    limits.cpu: "10"
+    limits.memory: 10Gi
+
+##Service
+NodePort: This allow internal pod accessible on the port on node (External access to Apps).
+ClusterIp: This service create virtual IP inside the cluster to enable internal communication such as cummunication between frontend server to set of backend server(enable internal communication).
+LoadBalancer: Provision Load Balancer
+
+#Sample NodePort service definition file
+apiVerstion: v1
+kind: Service
+metadata:
+  name: myservice
+spec:
+  type: NodePort
+  ports:
+  - targetPort: 80
+    port: 80			#mandatory
+    nodePort: 30008		#range(30000 to 32767)
+  selector:
+    app: myapp
+	type: front-end
+	
+kubectl expose deployment simple-webapp-deploy --name=webapp-service --targetport=8080 --type=NodePort --port=8080 --dry-run=client -o yml>>mysvc.yml
+kubectl expose po web --name=webpod-service --targetport=8080 --type=NodePort --port=8080 --dry-run=client -o yaml>>mysvc.yml
+
+#Imperative vs Declarative
+#create object
+kubectl run nginx --image=nginx
+kubectl create deployment nginx --image=nginx
+kubectl expose deployment nginx --port 80
+
+#Update Obj
+kubectl edit deployment nginx
+kubectl scale deployment nginx --replicas=5
+kubectl set image deployment nginx nginx=nginx:1.18
+
+kubectl create -f nginx.yaml
+kubectl replace -f nginx.yml
+kubectl delete -f nginx.yml
+kubectl replace --force -f nginx.yml ##to completely delete & recreate object
+
+
+#Declarative: In this we use kubectl apply command bcz apply is interligent enough to apply the changes bcz kubectl create we must know wether the obj already exist or not.
+
+#create nginx pod
+kubectl run nginx --image=nginx
+
+#Generate pod menifest file 
+kubectl run nginx --image=nginx --dry-run=client -o yaml
+
+#Create Deployment
+kubectl create deployment nginx --image=nginx
+
+#Generate Deployment Yaml file
+kubectl create deployment nginx --image=nginx  --dry-run=client -o yaml
+
+#Generate Deployment with 4 Replicas
+kubectl create deployment nginx --image=nginx --replicas=4
+
+#Scale Deployment
+kubectl scale deployment nginx --replicas=4
+
+#SERVICE
+#create service named redis-service of type ClusterIp to Expose pod redis on port 6379
+kubectl expose pod redis --name redis-servoce --port=6379 --dry-run=client -o yaml
+
+#Create service named nginx of type NodePort to expose pod nginx to port 80 on port 30080
+kubectl expose pod nginx --name nginx-service --port=80 --type=NodePort --dry-run=client -o yaml  #This will automatically use the pods label as selectors but you can not specify the node port  you have to generate a definition file and then add the node port in manually before creating the service with the pod.
+
+#what is taint and toleration
+taint: they allow a node to repel a set of pods
+Tolerations are applied to pods, and allow (but do not require) the pods to schedule onto nodes with matching taints.
+
+taint:
+kubectl taint nodes node1 key1=value1:NoSchedule
+
+#effects
+#NoSchedule: means pods will not be schedule on the node
+#PreferNoSchedule: Means system will try to avoid placing the pod on node
+#NoExecute: new pods will not be schedule on node and any existing pod will be evicted if it can not tolerate the taint
+
+tolerations:
+- key: "key1"
+  operator: "Equal"
+  value: "value1"
+  effect: "NoSchedule"
+  
+#Check if any taint on node01
+kubect describe node node01|grep taint
+
+#Create a taint on node01 with key of 'spray' value 'Mortein' and effect of NoSchedule
+kubectl taint node node01 spray=mortein:NoSchedule
+
+#Remove taint on Master which has effect of NoSchedule
+kubectl taint node master node-role.kubernetes.io/master:NoSchedule-
+
+
+###Node Selector
+#label node
+kubectl lable node node01 size=large
+
+#now that we have label on the node now we can specify the lable on pod menifest
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+  - name: data-processor
+    image: data-processor
+  nodeSelector:
+    size: large
+	
+
+#what is node affinity and pod affinity
+Node Affinity ensures that pods are hosted on particular nodes.
+This will provid advance capabilities to limit the pods on specific nodes.
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: size
+            operator: In/NotIn/Exists
+            values:
+            - large
+			- Medium
+			
+what if we dont have the node with lable large, then here are the type that will comes to picture
+			
+				DuringScheduling		DuringExecution
+Type1			Required				Ignored
+Type2			Prefered				Ignored
+Type3			Required				Required
+			
+If required type is applied it will force check for Affinity rule and if preffered type is applied it will ignore the rule and place the pod.			
+another senario is lets say the admin remove the label from node that has the pod running on it what will happen to that as per current availability type it will be ignored.
+			
+##ensure that the pod must be placed on Master only
+- matchExpressions:
+  - key: node-role.kubernetes.io/master
+    operator: Exists
+	
+Pod Affinity ensures two pods to be co-located in a single node.
+
+##Resource Limit
+you can specify the resource limit & requirments in POD definition file 
+spec:
+  containers:
+  - name: simple-webapp-color
+    image: simple-webapp-color
+	ports:
+	  - containerPort: 8080
+	resources:
+	  requests:
+	     memory: "1Gi"
+		 cpu: 1
+	  limits:
+	     memory: "2Gi"
+		 cpu: 2
+		 
+#Quick note on edit POD and Deployment
+POD: 
+  You CAN NOT update the specification of an existing Pod
+  To do that make the changes to pod defination file
+  delete the pod
+  Recreate with new definition file
+ 
+Deployment:
+  Since the POD template is child of deployment, you can easily make the changes to the deployment.
+  with every change the deployment will automatically delete & create new pods with new changes you can do that by running 
+     kubectl edit deployment my-deployment
+
+#STATIC POD:
+   what if control plan doesnt exists that means there is no apiserver, scheduler etcd etc so now you have only kubelet on worker node so how you will tell kubelet about the pod definition file. it can be done by placing them into /etc/kubernetes/menifests file. kubelet periodically check this directory and create new pod if new pod definatione exists
+   it not only create pod it also ensures that the pod stays alive if application crashes the kubelete will recreate, if you make any change to this file then kubelete recreate podwith latest defn & if you remove the file from this dir the file will be automatically deleted this is called static pod.
+   NOTE: you can only create POD this way but not replicaset or deployments.
+   #Static pod path
+   /var/lib/kubelet/config.yaml 
+   staticPodPath = /etc/kubernetes/manifest
+   
+   #diff between Static Pod and Daemonsets
+   Static Pod                             Daemonsets
+Created by Kubelet                 Created by kube API server(Daemonset controller)
+Deploy control plan components     Deploy Monitoring Agent, Logging Agent as nodes.
+as static pod
+Ignored by Kube-Scheduler          Ignored by Kube-Scheduler
+   
+#How many static pods exists in the cluster in all namespaces
+kubectl get pod --all-namespaces & look for those with -controlplane appended in the names
+kubectl get pods --all-namespaces|grep "master."
+
+#find the path of the directory holding the static pod defn files.
+To do this will do "ps -eaf|grep kubelet" & look for the config property (--config=/var/lib/kubelet/config.yaml) after will open the config.yaml and look for the "StaticPodPath"
+property in the file "/etc/kubernetes/manifest"
+
+#Create static pod named static-busybox that uses the busybox image and command sleep 1000
+kubectl run static-busybox --image=busybox --command sleep 1000 --dry-run=client --restart=Never -o yaml >static_pod.yaml
+
+#Remove the static pod green-box
+Run kubectl get pod -o wide & get the IP address, now SSH into this node find the config.yaml and search for the "StaticPodPath" now go to the path specified and delete the pod defn.
+
+#Logging and Monitoring
+## This will give the consumption of CPU and Memory on nodes
+kubectl top node  	 
+
+## This will give the consumption of CPU and Memory on nodes
+kubectl top pods
+
+#how to check the logs of pod or deployment
+kubectl logs podname
+kubectl logs deploymentname
+kubectl logs -f event-simulator-pod             ## -f will show the active logs
+kubectl logs -f event-simulator-pod container2        ## if pod has more than one container then you need to specify the container name to ckubectl logs command
+
+#how to check how many pods are running
+kubectl get po
+
+##Rolling Update and Rollback
+#view the status of rollout deployment
+kubectl rollout status deployment/myapp-deployment
+
+#Deployment Stretergy
+#Recreate: In this all the pods will be down until new version of pods is available, the problem in this stratergy is that the application will be completely down till that time.
+#Rolling Update (Default): In this the pods will not be bring down all at once thus ensuring the application is up
+
+k describe deploy mydeploy   ## to view the stratergy used
+
+when you create a deployment it will create the replicaset alog with Pods inside it and when you upgrade the k8s will create another replicaset and create pods underneathof that this can be seen by "kubectl get rs"
+
+##Rollback
+#To rollout the changes to previous version do
+kubectl rollout undo deployment/myapp-deployment   #The deployment will destroy the pods from new RS and bring up the pods from old rs and your application is back again
+
+
+#CREATE:   kubectl create -f deploy-def.yml
+#GET   :   kubectl get deployment
+#UPDATE:   kubectl apply -f deploy-def.yml
+#          kubectl set image nginx=nginx:1.91 deployment/myapp-deployment
+#STATUS:   kubectl rollout status deployment/myapp-deployment
+#		   kubectl rollout history deployment/myapp-deployment
+#ROLLBACK: kubeclt rollout undo deployment/myapp-deployment
+
+#Commands in Docker:
+CMD: this specify the command to be executed when container runs.
+unlinke VM containers are not ment to host the Operating system it was ment to perform perticular task, once the task completed the container Exists.
+
+#How to specify diff command to container
+one option to append the command to the docker run command & that way it will overight the default command.
+eg: docker run ubuntu sleep 5
+But how do you make this permanent that means container should run sleep everytime then you have to modify the container definition.
+
+FROM ubuntu
+CMD sleep 5
+
+there are diffrent way of specifying CMD
+CMD command param1
+CMD ["command", "param1"]  ##json array format first element should be executable.
+CMD ["sleep", "5"]	
+
+how to make this dynamin not hardcoded using Entrypoint instruction so that we only want to pass the no of second container should sleep.
+docker run ubuntu_sleeper 10
+
+FROM ubuntu
+ENTRYPOINT ["sleep"]
+
+so now whatever you passed as argument will be appended to sleep, but what if you didnt passed any argument then container will fail to pass the Default value  to handle this we have to specify CMD and ENTRYPOINT in combination
+
+FROM ubuntu
+ENTRYPOINT ["sleep"]
+CMD ["5"]
+
+now this will append the args if passed to entrypoint and if args is missing then it will append by default "5" to it. finally what if you want to replace the entry point sleep with sleep2.0 you can do that using --entrypoint 
+
+docker run --entrypoint sleep2.0 ubuntu-sleeper 10
+
+#Command and Args in k8s:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu-sleeper-pod
+spec:
+  containers:
+    - name: ubuntu-sleeper
+      image: ubuntu-sleeper
+      command: ["sleep2.0"]            ## ENTRYPOINT["sleep2.0"]
+      args: ["11"]	                   ## CMD ["11"]
+
+##ENV variable:
+we can specify the env variable using en it contain an array, each item has its name and values
+
+spec:
+  containers:
+  - name: simple-web-color
+    image: simple-web-color
+	ports:
+	  - containerPort: 8080
+	env:
+	  - name: APP_COLOR
+	    value: pink
+		
+##Config Map: 
+its sometime difficult to manage multipe data inside the configuration file we can take this information out of the pod definition file and store it centrally using file called configmap.
+   ConfigMap are used to store the config data in the form of key-value pair in k8s, when the pod is created inject the configmap so that keu-value data is available as an env variable to application.
+   There are 2 phases involved in configmap
+#1) Create Config Map:
+   kubectl create configmap <config-name> --from-literal=<key>=<value>
+   eg:
+   kubectl create configmap app-config --from-literal=APP_COLOR=blue \
+                                       --from-literal=APP_MOD=produce
+									   
+   kubectl create configmap <config-name> --from-file=<path-to-the-file>
+   eg:
+   kubectl create configmap app-config --from-file=app_config.property
+#2) Ingesting:
+#env:
+spec:
+  containers:
+    - name: simple-webapp-color
+	  image: simple-webapp-color
+	  envFrom:
+	  - configMapRef:
+	      name: app-config
+#Volume:
+volumes:
+- name: app-config-volume
+  configMap:
+    name: app-config
+	
+#single Env:
+env:
+- name: APP_COLOR
+  valueFrom:
+    configMapKeyRef:
+      name: app-config
+      key: APP_COLOR
+	  
+###Secrets: This is used to store sensitive information.
+
+#1. Creating Secrets
+#literals:
+kubectl create secret generic <secret-name> --from-literal=key=value
+eg:
+
+kubectl create secret generic app-secret --from-literal=DB_HOST=mysql --from-literal=DB_PASS=password
+
+#file:
+kubectl create secret generic app-secret --from-file=app-secret.property
+
+#for encoding
+echo -n "Hellow"|base64  
+
+#Decoding
+echo -n "CM9z7h=="|base64 --decode
+
+#2. Injection to pod.
+envFrom:
+- secretRef:
+    name: app-secret
+	
+volumes:
+- name: app-secret-volume
+  secret:
+    name: app-secret
+
+env:
+- name: DB_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: app-secret
+      key: DB_PASS	  
+
+
+ #Initcontainer:
+ At times you may want to run a process that runs to completion in a container for example a process that pulls a code or binary from repository that will be used by the main web application, this task executed only one time when the POD is first created or a process that waits for an External service or database to be up before the actual application start thats where InitContainers comes in.
+   InitContainer specified inside initContainer section.
+   when POD is created the initContainer will run first and process in the initcontainer must run to a completion before the real container hosting the application start.
+   you can configure multiple such initcontainer as well like we did for multipod containers in that case each init container is run one at a time in sequential order.
+   
+ If any initcontainers fail to complete k8s restart the pod  repetedly until the init containers succeeds.
+
+spec:
+  containers:
+  - name: myapp-container
+    image: busybox:1.28
+    command: ['sh', '-c', 'echo the app is running! && sleep 3600']
+  InitContainers:
+  - name: init-myservice
+    image: busybox
+    command: ['sh', '-c', 'git clone <repo-link>; done;']
+  - name: init-mydb
+    image: busybox:1.28
+	command: ['sh','-c','until nslookup mysqldb; do each waiting for mydb; sleep2; done']
+	
+#Cluster Maintenance:
+when you do upgrade and you know the node will not be back in 5 mins then you can Drain the node like
+
+kubectl drain node01   
+
+This will gracefully terminate the pod from the node and recreate on other node and also mark the node as Un-Schedulable, Once the node is back it will still remain unschedulable so for that you first need to do 
+
+kubectl uncordon node01  #this will mark the node as schedulable
+
+kubectl cordon node01 # Mark the Node Unschedulable
+
+#Take all pods out for the Maintainance on node01
+kubectl drain node01 --ignore-daemonsets
+
+#Why are there no pods on node01?
+only when new pods are created they will be scheduled
+
+#can we evict pod from node01 similar like node01
+No, bcz there are few pods that are not configured with Daemonsets or replicaset hence need to use --force
+
+#kubectl version
+kubectl version --short  ##this will show the kubectl version
+kubeadm version
+
+kubectl get nodes
+NAME    STATUS    ROLES    AGE   VERSION
+node01  Ready     <none>   1s    v1.11.3
+
+#Cluster Upgrade Process:
+Kubernetes support upto recent 3 minor version so v12 being latest release k8s will support v12, v11, v10, How will we upgrade from v10-v13, NO its always suggested to upgarade at one minor version v10 to v11.
+
+If you have setup your cluster using kubeadm then you can do this by
+
+kubeadm upgrade plan
+kubeadm upgrade apply
+
+Upgrade will be done first on Master and then on Worker when upgrading master apiserver, scheduler, ETCD will go down but your worker will remain available & serving the request but since the master is down your all managment apps will be down you can not occess or create any new object using kubectl
+
+There are diffrent strategies to upgrade worker nodes.
+1) upgrade all at once: But this require down time bcz all pod will be down
+2) upgrade one node at a time: In this the workload first shared & then one by one upgrade.
+
+kubeadm upgrade apply   #this will give following info
+cluster version       : v1.11.8
+kubeadm version       : v1.11.3
+latest stable version : v1.13.4
+
+
+component	current		available
+APISERVER	v1.11.8		v1.13.4
+CONTROLLER	v1.11.8		v1.13.4
+SCHEDULER	v1.11.8		v1.13.4
+KUBE PROXY	v1.11.8		v1.13.4
+
+Upgrading Master:
+#1) upgrade the kubeadm installer version on master
+    apt-get upgrade -y kubeadm=1.12.0-00
+#2)	apply the latest kubeadm version
+    kubeadm upgrade apply v1.12.0
+#3) upgrade the kubectl version on master
+    apt-get upgrade -y kubelet=1.12.0-00
+    systemctl restart kubelet	
+	
+Upgrading Worker:
+#1)master: drain node01
+	kubectl drain node01	
+#2)
+	apt-get upgrade -y kubeadm=1.12.0-00
+	apt-get upgrade -y kubelet=1.12.0-00
+	kubeadm upgrade node config --kubelet-version v1.12.0
+	systemctl restart kubelet
+#3) Uncordon node01
+    kubectl uncordon node01	
+		  
+####ETCD backup and restor
+ETCD: store the info about the state of the cluster it store the data into datadir /avr/lib/etcd it also comes with etcd snapshot utility.
+
+etcd snapshot save -h   #this will list all the mandatory option for save command
+etcd snapshot restor -h #this will show the mandatory option for restor command
+
+ETCDCTL_API=3 etcdctl snapshot save snapshot.db  #this command will create the snapshot.db in current dir to view the status of the backup use
+ETCDCTL_API=3 etcdctl snapshot status snapshot.db
+
+ETCDCTL_API=3 etcdctl snapshot save snapshot.db \
+-- endpoints = https://127.0.0.1:2379 \
+-- cacert = /etc/etcd/ca.crt \
+-- cert = /etc/etcd/etcd-server.crt \
+-- key = /etc/etcd/etcd-server.key \
+
+
+To restor the server from this backup
+#1) First Stop the kube-apiserver
+    service kube-apiserver stopped
+#2) Restore
+ETCDCTL_API=3 etcdctl snapshot restore snapshot.db \
+-- cacert = /etc/kubernetes/pki/etcd/ca.cert \
+-- cert = /etc/kubernetes/pki/etcd/server.crt \
+-- key = /etc/kubernetes/pki/etcd/server.key
+-- endpoint = 127.0.0.1:2379 \
+-- datadir=/var/lib/etcd-from-backup \
+-- initial-cluser master=https://127.0.0.1:2380 \
+-- name = "master"
+-- initial-cluster-token = "etcd-cluster-1"
+--initial-advertise-peer-url = "https://127.0.0.1:2380"
+
+after this you have to update the etcd.yml static pod def file in /etc/kubernetes/manifest folder
+> update the datadir to /var/lib/etcd-from-backup
+> add --initial-cluster-token
+> update the mount Path from /var/lib/etcd to /var/lib/etcd-from-backup
+> update the hostpath from /var/lib/etcd to /var/lib/etcd-from-backup
+
+
+#####RBAC
+we create the role using role def file.
+
+k create role developer --resource=pods --verb=list,create
+
+#developer_role.yml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: developer_role
+rules:
+- apiGroups: [" "]  #for core group you can specify apiGroup section as a Blank but for any other you have to specify the apiGroup.
+  resources: ["Pods"]
+  verbs: ["list", "get", "create", "update", "delete"]	
+
+
+#kubectl create -f developer_role.yml
+
+k create rolebinding dev-user-binding --role=developer --user=dev-user
+
+next step is to link the user to the role, we create role binding for this
+devuser-developer-binding.yml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: devuser-developer-binding
+subjects:
+  - kind: User
+    name: dev-user
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+    kind: Role
+    name: developer_role
+    apiGroup: rbac.authorization.k8s.io
+
+#kubectl create -f devuser-developer-binding.yml
+Now dev-user will get the access to the pods within the default namespace but if you want user access pods in some other Namespace then specify the namespace in defination file while creating them in metadata section.
+
+#view RBAC:
+kubectl get roles 			#=> list roles
+kubectl get rolebindings	#=> list available role bindings
+kubectl describe role developer 
+kubectl describe rolebinding devuser-developer-binding
+
+#CheckAccess: If you want to check your access to perticular resource on the cluster
+kubectl auth can-i create deployments
+kubectl auth can-i delete nodes
+
+#if you are admin you can also impersonate other user to check that
+kubectl auth can-i create deployment --as dev-user
+kubectl auth can-i create pods --as dev-user
+kubectl auth can-i create pods --as dev-user --namespace test
+
+##Resource Names: lets say you have 5 pods in Namespace and we only want to give access to 2 of them (Blue and Orange)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: develop
+roles:
+  apiGroup: [" "]
+  resources: ["pods"]
+  verb: ["get", "create", "update"]
+  resourceNames: ["blue", "orange"]
+
+#Q. Inspect the env and identify the authorization modes config on cluster check kube-api server setting
+#Run the command "kubectl describe pod kube-apiserver-controlplane -n kube-system" & look for the --authorization-mode  
+
+#What role is available in kube-system namespace with name kube-proxy
+kubectl describe role kube-proxy -n kube-system
+
+#####Cluster Role and Cluster Role Binding
+As we said roles and role binding are created within Namespace, if you dont specify a NS then it will be created in default NS and control access within that NS along.
+As we know NS helps in group the resources like Pods, Replica set, Deployment.
+but nodes are cluster wide resource, cluster scopped resources athat dosnt specify a resource NS.
+kubectl api-resources --namespaced=true  		#This will return namespaced resources
+kubectl api-resources --namespaced=false  		#This will return cluster spaced resources
+
+To authorized on cluster scoped resources here we use the cluster scope roles and cluster scope binding
+ex: Cluster Admin role can be created to view/create/delete Nodes
+    Storage Admin role can be created to view/create/delete PVs
+
+#admin-role.yml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-admin
+roles:
+- apiGroups: [" "]
+  resources: ["nodes"]
+  verbs: ["list", "get", "create", "delete"]
+  
+The next step is to link the user to that node for this we create rolebinding "cluster-admin-role-binding.yml"
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-admin-role-binding
+subjects:
+- kind: user
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
+
+#show list of cluster roles
+kubectl get clusterrole --no-header     
+
+#Show list of cluster role bindings
+kubectl get clusterrolebindings --no-header
+
+#what user/group cluster-admin role bound to?
+kubectl describe clusterrolebinding cluster-admin
+
+#what level of permission cluster-admin role grants ?
+kubectl describe clusterrole cluster-admin
+
+####Security Context
+As you know when we run a docker container we can define a set of security standard such as id of user that can run the container, a linux capability that can be added or removed.
+docker run --user=1000 ubuntu sleep 3000
+docker run --cap-add MAC_ADMIN ubuntu
+In k8s container are configured inside pod, you may choose to configure the security setting at container level or at pod level.
+pod level = setting carry over to all pods inside the container
+If applied on both then container will override the pod settings.
+
+#Podlevel:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-pod
+spec:
+  securityContext:
+     runAsUser: 1000
+containers:
+- name: ubuntu
+  image: ubuntu
+  command: ["sleep", "3600"]
+
+#Container level
+containers:
+- name: ubuntu
+  image: ubuntu
+  command: ["sleep", "3600"]
+  securityContext:
+    runAsUser: 1000
+    capabilities:
+      add: ["MAC_ADMIN"]
+
+#what is the user used to execute the sleep process within the ubuntu-sleeper pod
+kubectl exec ubuntu-sleeper -- whoami
+
+#Try to run the below command in the pod to set the date if the security capabilities was added correctly
+k exec -it ubuntu-sleeper -- date -s '19 APR 2012 11:14:00'	  
+  
+#####Network Policy:
+by default all pods are configured with "All-Allow" that means internally it can connect to all pods directly but what if you dnt want your front-end web server to be able to communicate to db-server directly that where we will implement the network policy.
+
+Network policy is another obj is k8s namespace, you can link network policy to one or more pods, you can define rules for new policies.
+Network policy uses the selector and label to link the pods.
+
+#Not all network solution support network policies
+support: kube-router, calico, romana, weave-net
+NOT Support: flannel
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: 
+  name: db-policy
+spec:
+  podSelector:
+    matchLabels:
+	  role: db
+  PolicyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          name: api-pod
+      ports:
+      - protocol: TCP
+        port: 3306	  
+
+
+#@ Create a network policy to allow triffic from the 'internal' application only to 'payroll-service' & 'db-service'
+#PolicyName: internal-policy
+#Policy Type: Egres
+#Egress Allow: payroll
+#Payroll Port: 8080
+#Egress allow: mysql
+#MYSQL port: 3306
+
+apiVersion: network.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: internal-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+	  name: internal
+  PolicyTypes:
+  - Egress
+  - Ingress
+  ingress:
+  - {}
+  egress:
+  - to:
+     - podSelector:
+	     matchLabels:
+		   name: mysql
+	   ports:
+	   - protocol: TCP
+	     ports: 3306
+  - to:
+     - podSelector:
+	     matchLabels:
+		   name: payroll
+	   ports:
+	   - protocol: TCP
+	     ports: 8080
+		 
+		 
+##Service Networking:
+For brue pod to access Orange pod we have to create an Orange service the orange service gets an IP address & name defined to it, the blue pod can access the orange  service from its ip or its name, blue and orange pods are on the same node, but what about access from other pods on other nodes, 
+  when the service is created it is accessible on all pods of the cluster irrespective of what nodes the pods are on.
+  while pods are hosted on nodes, a service is hosted across the cluster.
+
+#ClusterIP:  
+   Service will be accessible within the cluster
+   
+#NodePort:
+   To access the pods outside we make the service of type NODE PORT this will also get the IP assigned but also get port that will be accessible from outside.
+
+As we know kubelet process responsible for creating a PODS, each kubelet service on each node whatches the changes in the cluster through the kubeapi server and everytime a new pod is created it create the pod on the nodes,
+similarly each node runs another component know as kube-proxy, kube-proxy watches the changes in the cluster through kube-api server & everytime a new service is to be created kube-proxy gets into action, unlike pod service are not created on each node, service are cluster wide concept.
+
+
+kube-proxy create ip table rule which will forward the traffic that is comming towards the service to the backend pods.
+
+you can see the iptable rule created by service using.
+#iptables -L -t net|grep db-service
+
+
+##Volume in k8s:
+k8s the pods are transient in nature that means whatever data the pods generated that will get deleted with pod for this we have to attach the volume to the pod.
+we will create a simple pod that generate random number and store it into a file called /opt/number.out it then gets deleted along with the randon number to retain the random number created by pod we create a volume.
+
+we simply configure it to a dir on the hosts. i specified the path /data on the host this way any file created will be stored inside /data on my node once the volume is created to access it from a container we need to mount a volume to a directory inside the container.
+the random number will be stored on /opt mount which will happen to be /data on my node.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: random-num-generator
+spec:
+  containers:
+  - image: alpine
+    name: alpine
+	command: ["/bin/sh", "-c"]
+    args: ["shof -i 0-100 -n 1 >> /opt/number.out;"]
+	volumeMounts:
+	  - mountPath: /opt
+	    name: data-volume
+  volumes:		
+  - name: data-volume
+    hostPath:
+      path: /data
+      type: Directory
+
+####PV:
+In previous section we configured the volume in pod defination file, when you have a large env with lots of pods the user will have to configure storage everytime for each pod, if any changes are made the user will have to it on his pod.
+   Instead you would like to manage storage more centrally you would like it to configured in way that an admin can create a large pool of storage and then have user claim peice from it as required that is when PV can help.
+   
+   Access Mode: ReadOnlyMany
+                ReadWriteOnce
+				ReadWriteMany
+
+#pv-definition.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-voll
+spec: 
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /tmp/data   
+	
+## PVC
+pv and pvc are 2 separate objects in k8s namespace, admin create set of PV and the user create PVC to use the storage. once the PVC is created PVC will bind the PV to claim based on requisit & properties set on the Volume, every PVC  bound to single PV.
+  k8s tries to find the sufficient PV as requested by the PVC. however if there are multiple possible matches for a single claim & you will like to specifically use a perticular volume you could still use labels and selectors to bind the right volume finally if smaller claim is assigned to largge volume if no other option available and as it has one-to-one relationship so the remaining claim will not be utilized.
+  
+pvc-definition.yml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+	  storage: 500Mi
+	  
+But what happen when claim is deleted, you can chose what is to happen to the volume.
+by default it is set to RETAIN means PV will remain until it is manually deleted, it will be not available for reuse by opther claim
+PersistentVolumeReclaimPolicy: Retain  ##default
+PersistentVolumeReclaimPolicy: Delete  ##Delete Automatically
+PersistentVolumeReclaimPolicy: Recycle ##Data will be cleaned before alocating to other claim.
+
+
+#use PVC in pod.
+spec:
+  containers:
+  - name: myfrontend
+    image: nginx
+	volumeMounts:
+	- mountPath: /var/www/html
+      name: mypd
+  volume:
+    - name: mypd
+      persistentVolumeClaim:
+        claimName: myclaim	
+		
+####STORAGE CLASS:
+In last session we saw how to create PV & PVC and how to bound the pod with PVC in current example we created pv using google cloud the proble here is that before this PV is created you must have created the Disc on google cloud everytime your application require storage you have to manually provision disk on google cloud and then manually create persistent volume definition file using the same name as that of the disc that you have created thats called STATIC PROVISIONING.
+
+It would be nice if volume gets provisioned automatically when application requires it and that where STORAGE CLASS comes in.
+
+With storage class you can provide provisioner such as google storage that can automatically provision storage on google cloud & attach that to pod when the claim is made thats called DYNAMIC PROVISIONING of volume, you do that by creating storage class object with api version as below
+
+#Storage class
+apiVersion: storage.k8s.io/v1
+kind: storageClass
+metadata:
+  name: google-storage
+provisioner: kubernetes.io/gce.pd
+
+#PV:
+apiVersion: v1
+kind: PersistentVolume
+metadata: 
+  name: pv-vol1
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 500Mi
+  getPersistentDisk:
+    pdName: pd-disk
+	fsType: ext4
+	
+#PVC:
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests: 
+      storage: 500Mi
+  storageClassName: google-storage
+
+#pod
+volumes:
+- name: data-volume
+  persistentVolumeClaim:
+    claimName: myclaim  
+
+#What is the deployment strategy used i your project
+A deployment strategy is a way to change or upgrade an application. The aim is to make the change without downtime in a way that the user barely notices the improvements.
+
+Blue-Green:
+The most common strategy is to use a blue-green deployment. The new version (the blue version) is brought up for testing and evaluation, while the users still use the stable version (the green version). When ready, the users are switched to the blue version. If a problem arises, you can switch back to the green version.
+
+A/B:
+A common alternative strategy is to use A/B versions that are both active at the same time and some users use one version, and some users use the other version. This can be used for experimenting with user interface changes and other features to get user feedback. It can also be used to verify proper operation in a production context where problems impact a limited number of users.
+
+Rolling strategy:
+The Rolling strategy is the default strategy used if no strategy is specified on a deployment configuration.
+A deployment strategy uses readiness checks to determine if a new pod is ready for use. If a readiness check fails, the deployment configuration will retry to run the pod until it times out. The default timeout is 10m,    
+
+A rolling deployment slowly replaces instances of the previous version of an application with instances of the new version of the application. A rolling deployment typically waits for new pods to become ready via a readiness check before scaling down the old components. If a significant issue occurs, the rolling deployment can be aborted.
+
+Canary Deployments:
+All rolling deployments in OpenShift Container Platform are canary deployments; a new version (the canary) is tested before all of the old instances are replaced. If the readiness check never succeeds, the canary instance is removed and the deployment configuration will be automatically rolled back. 
+
+
+The Rolling strategy will:
+
+	Execute any pre lifecycle hook.
+	Scale up the new replication controller based on the surge count.
+	Scale down the old replication controller based on the max unavailable count.
+	Repeat this scaling until the new replication controller has reached the desired replica count and the old replication controller has been scaled to zero.
+	Execute any post lifecycle hook.
+	
+The maxUnavailable parameter is the maximum number of pods that can be unavailable during the update. The maxSurge parameter is the maximum number of pods that can be scheduled above the original number of pods. Both parameters can be set to either a percentage (e.g., 10%) or an absolute value (e.g., 2). The default value for both is 25%.
+
+#What is Init Container
+A Pod can have multiple containers running apps within it, but it can also have one or more init containers, which are run before the app containers are started.
+
+Init containers are exactly like regular containers, except:
+
+Init containers always run to completion.
+Each init container must complete successfully before the next one starts.
+If a Pods init container fails, the kubelet repeatedly restarts that init container until it succeeds. However, if the Pod has a restartPolicy of Never, and an init container fails during startup of that Pod, Kubernetes treats the overall Pod as failed.
+
+#what is statefulset in k8s
+Manages the deployment and scaling of a set of Pods, and provides guarantees about the ordering and uniqueness of these Pods.
+
+A StatefulSet is another Kubernetes controller that manages pods just like Deployments. But it differs from a Deployment in that it is more suited for stateful apps. A stateful application requires pods with a unique identity (for example, hostname). One pod should be able to reach other pods with well-defined names
+
+#what is ingress
+In Kubernetes, an Ingress is an object that allows access to your Kubernetes services from outside the Kubernetes cluster. You configure access by creating a collection of rules that define which inbound connections reach which services. This lets you consolidate your routing rules into a single resource.
+
+#difference between secret and configmap
+The major difference is, Secrets store data in base64 format meanwhile ConfigMaps store data in a plain text. If you have some critical data like, keys, passwords, service accounts credentials, db connection string, etc then you should always go for Secrets rather than Configs.
+
+#what is livenessprobe and readinessprobe
+Kubernetes uses liveness probes to know when to restart a container. If a container is unresponsive—perhaps the application is deadlocked due to a multi-threading defect—restarting the container can make the application more available
+
+Kubernetes uses readiness probes to decide when the container is available for accepting traffic. The readiness probe is used to control which pods are used as the backends for a service. 
+
+#what is pod
+Pods are the smallest, most basic deployable objects in Kubernetes. A Pod represents a single instance of a running process in your cluster. Pods contain one or more containers, such as Docker containers.
+
+#Describe k8s architecture
+master:
+	kube-apiserver
+	etcd
+	controller manager
+	kube-scheduler
+	
+worker:
+	kubelet
+	kubeproxy
+	pod
+
+#update the password in secret without restarting the pod or deployment is it possible?
+Unlike using secret as an environment variable, using it with volume doesnt need any Pod restarting.
+
+#how to rollback the deployment.
+status:   kubectl rollout status deployment/nginx-deployment
+history:  kubectl rollout history deployment.v1.apps/nginx-deployment
+rollback: kubectl rollout undo deployment.v1.apps/nginx-deployment
+
+#features of k8s
+service discovery and loadbalancing
+self healing
+automatic rollback and rollout
+autoscaling
+batchExecution
+secrets and config management
+storage orchestration
+automatic binpacking
+
+#resilency test
+test that ensure recovery without data and functionality loss after failure
+In unit testing each module of the software is tested separately. In integration testing all modules of the the software are tested combined	
+
+
+
+####HSBC interview Questions
+how to manage shared library in jenkins
+how to create custom tags in jenkins
+where is syslog is stored
+path for docker logs
+Monitoring and logging tools used
+
