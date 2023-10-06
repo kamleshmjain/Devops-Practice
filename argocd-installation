@@ -1,0 +1,20 @@
+argocd setup
+https://argo-cd.readthedocs.io/en/stable/getting_started/
+
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+wait for all pods to be running
+kubectl get po -n argocd
+
+kubectl port-forward -n argocd svc/argocd-server 8080:443
+
+try accessing the argo cd ui 127.0.0.1:8080 using admin user and fetch pass
+kubectl get secret argocd-initial-admin-secret -n argocd -o yaml
+
+this will be in encoded test, decode it
+echo TTd1eUJpTFUzOGhCRFZhRQ==|base64 --decode
+M7uyBiLU38hBDVaE
+
+
+create the application.yaml and run kubectl apply -f application.yaml
