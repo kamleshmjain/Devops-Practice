@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+
+    tools {
+        jdk 'jdk11'
+        maven 'maven3'
+    }
+    
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+        
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/kamleshmjain/Devops-CICD.git'
+            }
+        }
+        stage('Code Compile') {
+            steps {
+                sh "mvn clean compile"
+            }
+        }        
+        stage('SONAR code scan') {
+            steps {
+                withSonarQubeEnv('sonar-scanner') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=DevOps-CICD \
+                    -Dsonar.java.binaries=. \
+                    -Dsonar.projectKey=DevOps-CICD '''
+    
+                }
+            }
+        }
+        stage('trivy scan') {
+            steps {
+               sh 'trivy fs --security-checks vuln,config /root/.jenkins/workspace/myfirstpipe'
+            }
+        }  
+        stage('code build') {
+            steps {
+               sh 'mvn clean install'
+            }
+        }          
+        stage('docker build') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'dockerhub-cred') {
+                        sh "docker build -t mayurcicd ."
+                    }
+                }
+            }
+        } 
+        stage('docker push') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'dockerhub-cred') {
+                        sh "docker tag mayurcicd kjain1/mayurcicd:$BUILD_ID"
+                        sh "docker push kjain1/mayurcicd:$BUILD_ID"
+                    }
+                }
+            }
+        }         
+    }
+}
