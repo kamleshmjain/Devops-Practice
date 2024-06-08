@@ -1,4 +1,4 @@
-GIT --- PUSH ---( BUID )
+GIT --- PUSH ---( BUID )---testing
   code move server                           ---- code clone ---
   create the jar and war file using maven    ---- MVN ---------- 
      Java      - maven/gradle  -- jar/war file
